@@ -136,7 +136,11 @@ class _SignupScreenState extends State<SignupScreen> {
                                             child: ElevatedButton(
                                               onPressed: viewModel.canSignUp && !viewModel.isLoading
                                                   ? () async {
-                                                      if (_formKey.currentState!.validate()) {
+                                                      // Always validate to show errors
+                                                      final isValid = _formKey.currentState!.validate();
+                                                      
+                                                      // Only proceed with signup if validation passes
+                                                      if (isValid) {
                                                         await viewModel.signUp();
                                                         // Navigate to verification screen after successful signup
                                                         if (mounted && viewModel.error == null) {
@@ -402,24 +406,12 @@ class _CustomTextFieldState extends State<_CustomTextField> {
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(_validateField);
+    // No automatic validation - only validate on form submission
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_validateField);
     super.dispose();
-  }
-
-  void _validateField() {
-    if (widget.validator != null) {
-      final error = widget.validator!(widget.controller.text);
-      if (error != _errorText) {
-        setState(() {
-          _errorText = error;
-        });
-      }
-    }
   }
 
   @override
@@ -451,7 +443,7 @@ class _CustomTextFieldState extends State<_CustomTextField> {
                     });
                   }
                 });
-                return null; // Always return null to prevent default error display
+                return error; // Return the actual error for form validation
               },
               style: const TextStyle(
                 fontSize: 14,

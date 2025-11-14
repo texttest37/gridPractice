@@ -40,12 +40,7 @@ class SignupViewModel extends BaseViewModel {
   }
   
   bool get canSignUp {
-    return _firstNameController.text.isNotEmpty &&
-           _lastNameController.text.isNotEmpty &&
-           _emailController.text.isNotEmpty &&
-           _passwordController.text.isNotEmpty &&
-           _confirmPasswordController.text.isNotEmpty &&
-           _isTermsAccepted;
+    return _isTermsAccepted;
   }
   
   String? validateEmail(String? value) {
@@ -79,8 +74,6 @@ class SignupViewModel extends BaseViewModel {
   }
   
   Future<void> signUp() async {
-    if (!canSignUp) return;
-    
     setLoading(true);
     
     try {
