@@ -1,4 +1,4 @@
-import 'package:app/src/views/screens/home_screen.dart';
+import 'package:app/src/views/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
