@@ -69,10 +69,10 @@ class VerificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> verifyCode() async {
+  Future<bool> verifyCode() async {
     if (!canVerify) {
       Logger.warning('VerificationViewModel: Verify code called but conditions not met');
-      return;
+      return false;
     }
 
     Logger.info('VerificationViewModel: Starting verification process');
@@ -86,14 +86,15 @@ class VerificationViewModel extends ChangeNotifier {
       // TODO: Implement actual verification logic
       Logger.info('VerificationViewModel: Verification API call successful');
 
-      // For now, just simulate success
-      // In real app, navigate to next screen or show success
+      _isLoading = false;
+      notifyListeners();
+      return true; // Verification successful
     } catch (e) {
       // Handle error
       Logger.error('VerificationViewModel: Verification failed', error: e);
-    } finally {
       _isLoading = false;
       notifyListeners();
+      return false; // Verification failed
     }
   }
 

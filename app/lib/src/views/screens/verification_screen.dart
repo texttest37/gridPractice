@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../viewmodels/verification_view_model.dart';
 import '../widgets/app_background.dart';
 import '../widgets/onboarding_header.dart';
+import 'verification_success_screen.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -135,7 +136,19 @@ class _VerificationScreenState extends State<VerificationScreen> {
                               width: double.infinity,
                               height: 48,
                               child: ElevatedButton(
-                                onPressed: viewModel.canVerify ? viewModel.verifyCode : null,
+                                onPressed: viewModel.canVerify
+                                    ? () async {
+                                        final success = await viewModel.verifyCode();
+                                        if (success && context.mounted) {
+                                          Navigator.of(context).pushReplacement(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const VerificationSuccessScreen(),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    : null,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF262626),
                                   disabledBackgroundColor: const Color(0xFF666666),
