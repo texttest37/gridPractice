@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import '../utils/logger.dart';
 
 class VerificationViewModel extends ChangeNotifier {
   final List<TextEditingController> _otpControllers = List.generate(
     4,
     (index) => TextEditingController(),
   );
-  
+
   final List<FocusNode> _otpFocusNodes = List.generate(
     4,
     (index) => FocusNode(),
@@ -23,7 +24,7 @@ class VerificationViewModel extends ChangeNotifier {
   String get email => _email;
   int get remainingTime => _remainingTime;
   bool get canResend => _canResend;
-  
+
   String get formattedTime {
     int minutes = _remainingTime ~/ 60;
     int seconds = _remainingTime % 60;
@@ -40,6 +41,7 @@ class VerificationViewModel extends ChangeNotifier {
 
   void setEmail(String email) {
     _email = email;
+    Logger.info('VerificationViewModel: Email set for verification');
     notifyListeners();
   }
 
@@ -59,6 +61,7 @@ class VerificationViewModel extends ChangeNotifier {
   }
 
   void clearOtp() {
+    Logger.debug('VerificationViewModel: Clearing OTP fields');
     for (var controller in _otpControllers) {
       controller.clear();
     }
@@ -67,24 +70,27 @@ class VerificationViewModel extends ChangeNotifier {
   }
 
   Future<void> verifyCode() async {
-    if (!canVerify) return;
+    if (!canVerify) {
+      Logger.warning('VerificationViewModel: Verify code called but conditions not met');
+      return;
+    }
 
+    Logger.info('VerificationViewModel: Starting verification process');
     _isLoading = true;
     notifyListeners();
 
     try {
       // Simulate API call
       await Future.delayed(const Duration(seconds: 2));
-      
+
       // TODO: Implement actual verification logic
-      print('Verifying OTP: $otpCode for email: $_email');
-      
+      Logger.info('VerificationViewModel: Verification API call successful');
+
       // For now, just simulate success
       // In real app, navigate to next screen or show success
-      
     } catch (e) {
       // Handle error
-      print('Verification failed: $e');
+      Logger.error('VerificationViewModel: Verification failed', error: e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -92,25 +98,30 @@ class VerificationViewModel extends ChangeNotifier {
   }
 
   Future<void> resendCode() async {
-    if (!_canResend) return;
+    if (!_canResend) {
+      Logger.warning('VerificationViewModel: Resend code attempted but not allowed yet');
+      return;
+    }
+
+    Logger.info('VerificationViewModel: Resending verification code');
 
     try {
       // Simulate API call
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Reset timer
       _remainingTime = 60;
       _canResend = false;
       startTimer();
-      
-      print('Resent verification code to: $_email');
-      
+
+      Logger.info('VerificationViewModel: Verification code resent successfully');
     } catch (e) {
-      print('Resend failed: $e');
+      Logger.error('VerificationViewModel: Resend code failed', error: e);
     }
   }
 
   void startTimer() {
+    Logger.info('VerificationViewModel: Starting verification timer (60 seconds)');
     _remainingTime = 60;
     _canResend = false;
     notifyListeners();
@@ -118,13 +129,14 @@ class VerificationViewModel extends ChangeNotifier {
     // Start countdown timer
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 1));
-      
+
       if (_remainingTime > 0) {
         _remainingTime--;
         notifyListeners();
         return true;
       } else {
         _canResend = true;
+        Logger.info('VerificationViewModel: Timer expired, resend now available');
         notifyListeners();
         return false;
       }
@@ -133,6 +145,7 @@ class VerificationViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    Logger.debug('VerificationViewModel: Disposing resources');
     for (var controller in _otpControllers) {
       controller.dispose();
     }

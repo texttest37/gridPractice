@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: const Text('Home'),
-              backgroundColor: AppColors.primaryColor,
+              backgroundColor: AppColors.primaryOrange,
             ),
             body: Center(
               child: Column(
@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
                   Icon(
                     Icons.home,
                     size: 80,
-                    color: AppColors.primaryColor,
+                    color: AppColors.primaryOrange,
                   ),
                   const SizedBox(height: 20),
                   Text(

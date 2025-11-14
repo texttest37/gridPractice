@@ -1,5 +1,6 @@
 import 'package:app/src/views/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'utils/constants/colors.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -8,10 +9,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'GridSmart',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryOrange),
+        scaffoldBackgroundColor: AppColors.backgroundColor,
+        fontFamily: 'Inter',
       ),
       home: const SplashScreen(),
     );
