@@ -68,6 +68,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       controller: viewModel.firstNameController,
                                       labelText: 'First Name',
                                       hintText: 'John',
+                                      textInputAction: TextInputAction.next,
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'First name is required';
@@ -79,6 +80,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       controller: viewModel.lastNameController,
                                       labelText: 'Last Name',
                                       hintText: 'Doe',
+                                      textInputAction: TextInputAction.next,
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'Last name is required';
@@ -92,6 +94,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                       hintText: 'jd@gmail.com',
                                       keyboardType: TextInputType.emailAddress,
                                       validator: viewModel.validateEmail,
+                                      enableSuggestions: true,
+                                      autocorrect: false, // Disable autocorrect for email
+                                      textInputAction: TextInputAction.next,
                                     ),
                                     _buildTextField(
                                       controller: viewModel.passwordController,
@@ -99,6 +104,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                       hintText: '123456',
                                       obscureText: !viewModel.isPasswordVisible,
                                       validator: viewModel.validatePassword,
+                                      enableSuggestions: false,
+                                      autocorrect: false, // Disable autocorrect for password
+                                      textInputAction: TextInputAction.next,
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           viewModel.isPasswordVisible
@@ -120,6 +128,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                           !viewModel.isConfirmPasswordVisible,
                                       validator:
                                           viewModel.validateConfirmPassword,
+                                      enableSuggestions: false,
+                                      autocorrect: false, // Disable autocorrect for confirm password
+                                      textInputAction: TextInputAction.done,
                                       suffixIcon: IconButton(
                                         icon: Icon(
                                           viewModel.isConfirmPasswordVisible
@@ -384,6 +395,10 @@ class _SignupScreenState extends State<SignupScreen> {
     bool obscureText = false,
     String? Function(String?)? validator,
     Widget? suffixIcon,
+    bool enableSuggestions = true,
+    bool autocorrect = true,
+    TextInputAction? textInputAction,
+    VoidCallback? onFieldSubmitted,
   }) {
     return _CustomTextField(
       controller: controller,
@@ -393,6 +408,10 @@ class _SignupScreenState extends State<SignupScreen> {
       obscureText: obscureText,
       validator: validator,
       suffixIcon: suffixIcon,
+      enableSuggestions: enableSuggestions,
+      autocorrect: autocorrect,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
     );
   }
 }
@@ -405,6 +424,10 @@ class _CustomTextField extends StatefulWidget {
   final bool obscureText;
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
+  final bool enableSuggestions;
+  final bool autocorrect;
+  final TextInputAction? textInputAction;
+  final VoidCallback? onFieldSubmitted;
 
   const _CustomTextField({
     required this.controller,
@@ -414,6 +437,10 @@ class _CustomTextField extends StatefulWidget {
     this.obscureText = false,
     this.validator,
     this.suffixIcon,
+    this.enableSuggestions = true,
+    this.autocorrect = true,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -454,6 +481,10 @@ class _CustomTextFieldState extends State<_CustomTextField> {
               controller: widget.controller,
               keyboardType: widget.keyboardType,
               obscureText: widget.obscureText,
+              enableSuggestions: widget.enableSuggestions,
+              autocorrect: widget.autocorrect,
+              textInputAction: widget.textInputAction ?? TextInputAction.next,
+              onFieldSubmitted: (_) => widget.onFieldSubmitted?.call(),
               validator: (value) {
                 final error = widget.validator?.call(value);
                 WidgetsBinding.instance.addPostFrameCallback((_) {

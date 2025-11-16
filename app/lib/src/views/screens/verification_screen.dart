@@ -104,6 +104,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                               focusNode: viewModel.otpFocusNodes[0],
                               keyboardType: TextInputType.text,
                               maxLength: 6,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              textInputAction: TextInputAction.done,
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.normal,

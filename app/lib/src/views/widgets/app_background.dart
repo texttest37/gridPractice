@@ -17,6 +17,7 @@ class AppBackground extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5), // Gray-50 background
       body: SafeArea(
+        bottom: false,
         child: Stack(
           children: [
             // Background shape - positioned and centered
@@ -42,7 +43,7 @@ class AppBackground extends StatelessWidget {
               physics: const AlwaysScrollableScrollPhysics(),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+                  minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
                 ),
                 child: child,
               ),
