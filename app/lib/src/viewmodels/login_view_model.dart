@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'base_view_model.dart';
 import '../views/screens/home_screen.dart';
+import '../views/screens/forgot_password_screen.dart';
 
 class LoginViewModel extends BaseViewModel {
   bool _rememberMe = false;
@@ -109,9 +110,12 @@ class LoginViewModel extends BaseViewModel {
   }
 
   // Forgot password
-  void forgotPassword() {
-    // TODO: Navigate to forgot password screen
-    setError('Forgot password feature coming soon');
+  void forgotPassword(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const ForgotPasswordScreen(),
+      ),
+    );
   }
 
   // Navigate to sign up
