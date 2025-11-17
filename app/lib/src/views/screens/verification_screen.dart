@@ -4,13 +4,18 @@ import '../../viewmodels/verification_view_model.dart';
 import '../widgets/app_background.dart';
 import '../widgets/onboarding_header.dart';
 import 'verification_success_screen.dart';
+import 'reset_password_screen.dart';
+
+enum VerificationFlow { signup, forgotPassword }
 
 class VerificationScreen extends StatefulWidget {
   final String email;
+  final VerificationFlow flow;
   
   const VerificationScreen({
     super.key,
     required this.email,
+    this.flow = VerificationFlow.signup,
   });
 
   @override
@@ -143,12 +148,21 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                     ? () async {
                                         final success = await viewModel.verifyCode();
                                         if (success && context.mounted) {
-                                          Navigator.of(context).pushReplacement(
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const VerificationSuccessScreen(),
-                                            ),
-                                          );
+                                          if (widget.flow == VerificationFlow.forgotPassword) {
+                                            Navigator.of(context).pushReplacement(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ResetPasswordScreen(),
+                                              ),
+                                            );
+                                          } else {
+                                            Navigator.of(context).pushReplacement(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const VerificationSuccessScreen(),
+                                              ),
+                                            );
+                                          }
                                         }
                                       }
                                     : null,

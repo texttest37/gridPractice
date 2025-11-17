@@ -39,7 +39,10 @@ class ForgotPasswordViewModel extends BaseViewModel {
         if (context.mounted) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => VerificationScreen(email: email),
+              builder: (_) => VerificationScreen(
+                email: email,
+                flow: VerificationFlow.forgotPassword,
+              ),
             ),
           );
         }
