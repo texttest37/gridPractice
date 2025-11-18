@@ -119,7 +119,7 @@ class _ForgotPasswordScreenContentState extends State<_ForgotPasswordScreenConte
                       textInputAction: TextInputAction.done,
                     ),
 
-                    SizedBox(height: isSmallScreen ? 32 : 40),
+                    SizedBox(height: isSmallScreen ? 20 : 24),
 
                     // Send OTP Button
                     Padding(
