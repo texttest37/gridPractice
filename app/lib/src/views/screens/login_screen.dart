@@ -90,6 +90,9 @@ class _LoginScreenContentState extends State<_LoginScreenContent> {
                       hintText: 'jd@gmail.com',
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) => viewModel.validateEmail(value),
+                      enableSuggestions: true,
+                      autocorrect: false, // Disable autocorrect for email
+                      textInputAction: TextInputAction.next,
                     ),
 
                     SizedBox(height: isSmallScreen ? 16 : 20),
@@ -101,6 +104,9 @@ class _LoginScreenContentState extends State<_LoginScreenContent> {
                       hintText: '***************',
                       obscureText: _obscurePassword,
                       validator: (value) => viewModel.validatePassword(value),
+                      enableSuggestions: false,
+                      autocorrect: false, // Disable autocorrect for password
+                      textInputAction: TextInputAction.done,
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword

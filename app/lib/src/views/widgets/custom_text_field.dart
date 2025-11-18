@@ -9,6 +9,10 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
   final int maxLines;
+  final bool enableSuggestions;
+  final bool autocorrect;
+  final TextInputAction? textInputAction;
+  final VoidCallback? onFieldSubmitted;
 
   const CustomTextField({
     super.key,
@@ -20,6 +24,10 @@ class CustomTextField extends StatefulWidget {
     this.validator,
     this.suffixIcon,
     this.maxLines = 1,
+    this.enableSuggestions = true,
+    this.autocorrect = true,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -50,6 +58,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
               keyboardType: widget.keyboardType,
               obscureText: widget.obscureText,
               maxLines: widget.maxLines,
+              enableSuggestions: widget.enableSuggestions,
+              autocorrect: widget.autocorrect,
+              textInputAction: widget.textInputAction ?? TextInputAction.next,
+              onFieldSubmitted: (_) => widget.onFieldSubmitted?.call(),
               validator: (value) {
                 final error = widget.validator?.call(value);
                 WidgetsBinding.instance.addPostFrameCallback((_) {

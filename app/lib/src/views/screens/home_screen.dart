@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/home_view_model.dart';
 import '../../utils/constants/colors.dart';
+import '../widgets/app_background.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,30 +18,33 @@ class HomeScreen extends StatelessWidget {
               title: const Text('Home'),
               backgroundColor: AppColors.primaryOrange,
             ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.home,
-                    size: 80,
-                    color: AppColors.primaryOrange,
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    viewModel.welcomeMessage,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: AppColors.textPrimary,
+            body: AppBackground(
+              topOffset: null, // No background shape for home screen
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.home,
+                      size: 80,
+                      color: AppColors.primaryOrange,
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    viewModel.description,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.textSecondary,
+                    const SizedBox(height: 20),
+                    Text(
+                      viewModel.welcomeMessage,
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    Text(
+                      viewModel.description,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
