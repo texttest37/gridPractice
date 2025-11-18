@@ -35,16 +35,19 @@ class ForgotPasswordViewModel extends BaseViewModel {
 
       // For now, simulate successful OTP send
       if (email.isNotEmpty) {
-        // Navigate to OTP verification screen
+        // Navigate to OTP verification screen with a small delay for UI stability
         if (context.mounted) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => VerificationScreen(
-                email: email,
-                flow: VerificationFlow.forgotPassword,
+          await Future.delayed(const Duration(milliseconds: 100));
+          if (context.mounted) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => VerificationScreen(
+                  email: email,
+                  flow: VerificationFlow.forgotPassword,
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
       } else {
         setError('Invalid email address');

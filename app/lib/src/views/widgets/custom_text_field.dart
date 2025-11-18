@@ -70,13 +70,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
               onChanged: widget.onChanged,
               validator: (value) {
                 final error = widget.validator?.call(value);
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted && error != _errorText) {
-                    setState(() {
-                      _errorText = error;
-                    });
-                  }
-                });
+                // Schedule setState for next frame to avoid calling setState during build
+                if (error != _errorText) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      setState(() {
+                        _errorText = error;
+                      });
+                    }
+                  });
+                }
                 return error; // Return the actual error for form validation
               },
               style: const TextStyle(

@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../viewmodels/reset_password_view_model.dart';
 import '../widgets/app_background.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/custom_button.dart';
 
-class ResetPasswordScreen extends StatefulWidget {
+class ResetPasswordScreen extends StatelessWidget {
   const ResetPasswordScreen({super.key});
 
   @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ResetPasswordViewModel(),
+      child: const _ResetPasswordScreenContent(),
+    );
+  }
 }
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+class _ResetPasswordScreenContent extends StatefulWidget {
+  const _ResetPasswordScreenContent();
+
+  @override
+  State<_ResetPasswordScreenContent> createState() => _ResetPasswordScreenContentState();
+}
+
+class _ResetPasswordScreenContentState extends State<_ResetPasswordScreenContent> {
+  final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _passwordFocusNode = FocusNode();
@@ -18,7 +34,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -29,38 +44,27 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     super.dispose();
   }
 
-  bool get _canSavePassword {
-    return _passwordController.text.isNotEmpty &&
-           _confirmPasswordController.text.isNotEmpty &&
-           _passwordController.text == _confirmPasswordController.text;
-  }
-
-  Future<void> _savePassword() async {
-    if (!_canSavePassword) return;
-    
-    setState(() {
-      _isLoading = true;
-    });
-    
-    // TODO: Implement password reset logic
-    await Future.delayed(const Duration(seconds: 2));
-    
-    setState(() {
-      _isLoading = false;
-    });
-    
-    if (mounted) {
-      // TODO: Navigate to success screen or login
-      Navigator.of(context).pop();
+  void _handleResetPassword(BuildContext context, ResetPasswordViewModel viewModel) {
+    if (_formKey.currentState?.validate() ?? false) {
+      viewModel.resetPassword(
+        _passwordController.text,
+        _confirmPasswordController.text,
+        context,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<ResetPasswordViewModel>();
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 600;
+    final horizontalPadding = isSmallScreen ? 24.0 : size.width * 0.1;
+
     return AppBackground(
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -68,25 +72,28 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             // Logo header
             const OnboardingHeader(),
 
-            const SizedBox(height: 96),
+            SizedBox(height: isSmallScreen ? 80 : 96),
 
             // Reset Password content
-            SizedBox(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Title
-                  const Text(
-                    'Reset Password',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFFF8B0A),
-                      fontFamily: 'Inter',
+            Container(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Title
+                    Text(
+                      'Reset Password',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 24 : 28,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFFFF8B0A),
+                        fontFamily: 'Inter',
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                    SizedBox(height: isSmallScreen ? 24 : 32),
 
                   // Section with subtitle and description
                   SizedBox(
@@ -121,101 +128,79 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Password Input Field
-                  CustomTextField(
-                    controller: _passwordController,
-                    label: 'Password',
-                    hintText: 'Enter password',
-                    obscureText: !_isPasswordVisible,
-                    keyboardType: TextInputType.text,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: () {
-                      _confirmPasswordFocusNode.requestFocus();
-                    },
-                    onChanged: (value) => setState(() {}),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                        color: const Color(0xFF666666),
-                        size: 20,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
+                    // Password Input Field
+                    CustomTextField(
+                      controller: _passwordController,
+                      label: 'Password',
+                      hintText: 'Enter password',
+                      obscureText: !_isPasswordVisible,
+                      keyboardType: TextInputType.text,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) => viewModel.validatePassword(value),
+                      onFieldSubmitted: () {
+                        _confirmPasswordFocusNode.requestFocus();
                       },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Confirm Password Input Field
-                  CustomTextField(
-                    controller: _confirmPasswordController,
-                    label: 'Confirm Password',
-                    hintText: 'Confirm password',
-                    obscureText: !_isConfirmPasswordVisible,
-                    keyboardType: TextInputType.text,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: () => _savePassword(),
-                    onChanged: (value) => setState(() {}),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                        color: const Color(0xFF666666),
-                        size: 20,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Save Password button container
-                  Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-                    width: double.infinity,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: _canSavePassword ? _savePassword : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF262626),
-                          disabledBackgroundColor: const Color(0xFF666666),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                      onChanged: (value) => setState(() {}),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                          color: const Color(0xFF666666),
+                          size: 20,
                         ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text(
-                                'Save Password',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFF6FFEC),
-                                  fontFamily: 'Inter',
-                                ),
-                              ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
                       ),
                     ),
-                  ),
-                ],
+                  const SizedBox(height: 16),
+
+                    // Confirm Password Input Field
+                    CustomTextField(
+                      controller: _confirmPasswordController,
+                      focusNode: _confirmPasswordFocusNode,
+                      label: 'Confirm Password',
+                      hintText: 'Confirm password',
+                      obscureText: !_isConfirmPasswordVisible,
+                      keyboardType: TextInputType.text,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      textInputAction: TextInputAction.done,
+                      validator: (value) => viewModel.validateConfirmPassword(_passwordController.text, value),
+                      onFieldSubmitted: () => _handleResetPassword(context, viewModel),
+                      onChanged: (value) => setState(() {}),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                          color: const Color(0xFF666666),
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                          });
+                        },
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+
+                    // Save Password button
+                    SizedBox(height: isSmallScreen ? 20 : 24),
+
+                    CustomButton(
+                      text: 'Save Password',
+                      onPressed: viewModel.isLoading
+                          ? null
+                          : () => _handleResetPassword(context, viewModel),
+                      isLoading: viewModel.isLoading,
+                    ),
+
+                    SizedBox(height: isSmallScreen ? 24 : 32),
+                  ],
+                ),
               ),
             ),
           ],

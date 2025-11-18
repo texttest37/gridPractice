@@ -139,23 +139,34 @@ class VerificationViewModel extends ChangeNotifier {
     
     _remainingTime = 60;
     _canResend = false;
-    notifyListeners();
-
-    // Start countdown timer
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_isDisposed) {
-        timer.cancel();
-        return;
+    
+    // Use a safer approach with mounted check
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isDisposed) {
+        notifyListeners();
       }
-      
-      if (_remainingTime > 0) {
-        _remainingTime--;
-        _safeNotifyListeners();
-      } else {
-        _canResend = true;
-        Logger.info('VerificationViewModel: Timer expired, resend now available');
+    });
+
+    // Start countdown timer with additional safety checks
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      try {
+        if (_isDisposed) {
+          timer.cancel();
+          return;
+        }
+        
+        if (_remainingTime > 0) {
+          _remainingTime--;
+          _safeNotifyListeners();
+        } else {
+          _canResend = true;
+          Logger.info('VerificationViewModel: Timer expired, resend now available');
+          timer.cancel();
+          _safeNotifyListeners();
+        }
+      } catch (e) {
+        Logger.error('VerificationViewModel: Timer error', error: e);
         timer.cancel();
-        _safeNotifyListeners();
       }
     });
   }
