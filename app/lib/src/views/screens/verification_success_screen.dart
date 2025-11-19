@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../utils/constants/colors.dart';
 import '../widgets/onboarding_header.dart';
 import '../widgets/app_background.dart';
+import '../widgets/custom_button.dart';
+import 'main_navigation_screen.dart';
 
 class VerificationSuccessScreen extends StatelessWidget {
   const VerificationSuccessScreen({super.key});
@@ -85,6 +87,20 @@ class VerificationSuccessScreen extends StatelessWidget {
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w400,
                     ),
+                  ),
+
+                  SizedBox(height: isSmallScreen ? 48 : 64),
+
+                  // Continue button
+                  CustomButton(
+                    text: 'Continue',
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => const MainNavigationScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

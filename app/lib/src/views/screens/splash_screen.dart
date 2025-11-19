@@ -1,8 +1,8 @@
+import 'package:app/src/views/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/splash_view_model.dart';
 import '../../utils/constants/colors.dart';
-import 'signup_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (mounted && viewModel.isInitialized) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const SignupScreen()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     }
   }
