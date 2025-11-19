@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../utils/logger.dart';
 
@@ -16,6 +17,15 @@ class VerificationViewModel extends ChangeNotifier {
   String _email = '';
   int _remainingTime = 60;
   bool _canResend = false;
+  Timer? _timer;
+  bool _isDisposed = false;
+
+  // Safe notifyListeners that checks if disposed
+  void _safeNotifyListeners() {
+    if (!_isDisposed) {
+      notifyListeners();
+    }
+  }
 
   // Getters
   List<TextEditingController> get otpControllers => _otpControllers;
@@ -123,23 +133,40 @@ class VerificationViewModel extends ChangeNotifier {
 
   void startTimer() {
     Logger.info('VerificationViewModel: Starting verification timer (60 seconds)');
+    
+    // Cancel any existing timer
+    _timer?.cancel();
+    
     _remainingTime = 60;
     _canResend = false;
-    notifyListeners();
-
-    // Start countdown timer
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 1));
-
-      if (_remainingTime > 0) {
-        _remainingTime--;
+    
+    // Use a safer approach with mounted check
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isDisposed) {
         notifyListeners();
-        return true;
-      } else {
-        _canResend = true;
-        Logger.info('VerificationViewModel: Timer expired, resend now available');
-        notifyListeners();
-        return false;
+      }
+    });
+
+    // Start countdown timer with additional safety checks
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      try {
+        if (_isDisposed) {
+          timer.cancel();
+          return;
+        }
+        
+        if (_remainingTime > 0) {
+          _remainingTime--;
+          _safeNotifyListeners();
+        } else {
+          _canResend = true;
+          Logger.info('VerificationViewModel: Timer expired, resend now available');
+          timer.cancel();
+          _safeNotifyListeners();
+        }
+      } catch (e) {
+        Logger.error('VerificationViewModel: Timer error', error: e);
+        timer.cancel();
       }
     });
   }
@@ -147,6 +174,13 @@ class VerificationViewModel extends ChangeNotifier {
   @override
   void dispose() {
     Logger.debug('VerificationViewModel: Disposing resources');
+    
+    // Mark as disposed to prevent further notifyListeners calls
+    _isDisposed = true;
+    
+    // Cancel the timer to prevent calling notifyListeners after disposal
+    _timer?.cancel();
+    
     for (var controller in _otpControllers) {
       controller.dispose();
     }

@@ -13,6 +13,8 @@ class CustomTextField extends StatefulWidget {
   final bool autocorrect;
   final TextInputAction? textInputAction;
   final VoidCallback? onFieldSubmitted;
+  final Function(String)? onChanged;
+  final FocusNode? focusNode;
 
   const CustomTextField({
     super.key,
@@ -28,6 +30,8 @@ class CustomTextField extends StatefulWidget {
     this.autocorrect = true,
     this.textInputAction,
     this.onFieldSubmitted,
+    this.onChanged,
+    this.focusNode,
   });
 
   @override
@@ -55,6 +59,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
             child: TextFormField(
               controller: widget.controller,
+              focusNode: widget.focusNode,
               keyboardType: widget.keyboardType,
               obscureText: widget.obscureText,
               maxLines: widget.maxLines,
@@ -62,15 +67,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
               autocorrect: widget.autocorrect,
               textInputAction: widget.textInputAction ?? TextInputAction.next,
               onFieldSubmitted: (_) => widget.onFieldSubmitted?.call(),
+              onChanged: widget.onChanged,
               validator: (value) {
                 final error = widget.validator?.call(value);
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted && error != _errorText) {
-                    setState(() {
-                      _errorText = error;
-                    });
-                  }
-                });
+                // Schedule setState for next frame to avoid calling setState during build
+                if (error != _errorText) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      setState(() {
+                        _errorText = error;
+                      });
+                    }
+                  });
+                }
                 return error; // Return the actual error for form validation
               },
               style: const TextStyle(

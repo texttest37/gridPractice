@@ -167,7 +167,7 @@ class _LoginScreenContentState extends State<_LoginScreenContent> {
                           ],
                         ),
                         TextButton(
-                          onPressed: viewModel.forgotPassword,
+                          onPressed: () => viewModel.forgotPassword(context),
                           child: Text(
                             'Forgot password?',
                             style: TextStyle(

@@ -4,13 +4,18 @@ import '../../viewmodels/verification_view_model.dart';
 import '../widgets/app_background.dart';
 import '../widgets/onboarding_header.dart';
 import 'verification_success_screen.dart';
+import 'reset_password_screen.dart';
+
+enum VerificationFlow { signup, forgotPassword }
 
 class VerificationScreen extends StatefulWidget {
   final String email;
+  final VerificationFlow flow;
   
   const VerificationScreen({
     super.key,
     required this.email,
+    this.flow = VerificationFlow.signup,
   });
 
   @override
@@ -21,9 +26,15 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => VerificationViewModel()
-        ..setEmail(widget.email)
-        ..startTimer(),
+      create: (_) {
+        final viewModel = VerificationViewModel();
+        viewModel.setEmail(widget.email);
+        // Start timer after frame is built to avoid issues
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          viewModel.startTimer();
+        });
+        return viewModel;
+      },
       builder: (context, child) {
         return Consumer<VerificationViewModel>(
           builder: (context, viewModel, child) {
@@ -139,16 +150,29 @@ class _VerificationScreenState extends State<VerificationScreen> {
                               width: double.infinity,
                               height: 48,
                               child: ElevatedButton(
-                                onPressed: viewModel.canVerify
+                                onPressed: viewModel.canVerify && !viewModel.isLoading
                                     ? () async {
                                         final success = await viewModel.verifyCode();
                                         if (success && context.mounted) {
-                                          Navigator.of(context).pushReplacement(
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const VerificationSuccessScreen(),
-                                            ),
-                                          );
+                                          // Use a small delay to ensure UI is stable before navigation
+                                          await Future.delayed(const Duration(milliseconds: 100));
+                                          if (context.mounted) {
+                                            if (widget.flow == VerificationFlow.forgotPassword) {
+                                              Navigator.of(context).pushReplacement(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const ResetPasswordScreen(),
+                                                ),
+                                              );
+                                            } else {
+                                              Navigator.of(context).pushReplacement(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const VerificationSuccessScreen(),
+                                                ),
+                                              );
+                                            }
+                                          }
                                         }
                                       }
                                     : null,
