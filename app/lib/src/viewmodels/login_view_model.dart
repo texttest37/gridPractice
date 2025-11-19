@@ -46,7 +46,8 @@ class LoginViewModel extends BaseViewModel {
   }
 
   // Login with email and password
-  Future<void> login(String email, String password, BuildContext context) async {
+  Future<void> login(
+      String email, String password, BuildContext context) async {
     setLoading(true);
     clearError();
 
