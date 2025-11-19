@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'base_view_model.dart';
-import '../views/screens/home_screen.dart';
+import '../views/screens/main_navigation_screen.dart';
 import '../views/screens/forgot_password_screen.dart';
 
 class LoginViewModel extends BaseViewModel {
@@ -60,10 +60,10 @@ class LoginViewModel extends BaseViewModel {
 
       // For now, simulate successful login
       if (email.isNotEmpty && password.isNotEmpty) {
-        // Navigate to home screen
+        // Navigate to main navigation screen (with bottom nav)
         if (context.mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
           );
         }
       } else {

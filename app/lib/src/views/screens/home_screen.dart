@@ -4,7 +4,6 @@ import '../../viewmodels/home_view_model.dart';
 import '../../utils/constants/colors.dart';
 import '../widgets/app_background.dart';
 import '../widgets/app_header.dart';
-import '../widgets/custom_bottom_nav_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -45,14 +44,6 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            // Bottom Navigation Bar
-            bottomNavigationBar: CustomBottomNavBar(
-              currentIndex: 0,
-              onTap: (index) {
-                // Handle navigation to different screens
-                // TODO: Implement navigation logic
-              },
             ),
           );
         },
